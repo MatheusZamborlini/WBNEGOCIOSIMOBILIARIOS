@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>W.B Negócios Imobiliários · Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --ink:#111;--white:#fff;--paper:#F5F5F5;
+  --g50:#FAFAFA;--g100:#F0F0F0;--g150:#E8E8E8;--g200:#DEDEDE;
+  --g300:#C0C0C0;--g400:#999;--g500:#666;--g700:#333;
+  --blue:#3B82F6;--green:#10B981;--amber:#F59E0B;--red:#EF4444;
+  --purple:#8B5CF6;--teal:#06B6D4;--rose:#F43F5E;--lime:#84CC16;
+  --orange:#F97316;--indigo:#6366F1;
+  --font:'Jost',system-ui,sans-serif;
+  --rad:8px;--rad-sm:5px;
+}
+html,body{min-height:100vh;font-family:var(--font);font-size:14px;color:var(--ink);background:var(--paper);overflow-x:hidden}
+
+/* ─── TOPBAR (white) ───────────────────── */
+.topbar{
+  background:var(--white);
+  border-bottom:1px solid var(--g150);
+  height:62px;padding:0 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:500;
+  box-shadow:0 1px 8px rgba(0,0,0,.06)
+}
+.tl{display:flex;align-items:center;gap:16px}
+.logo-svg{display:block;height:40px}
+.t-div{width:1px;height:26px;background:var(--g150)}
+.t-lbl{font-size:10px;font-weight:600;color:var(--g400);letter-spacing:2px;text-transform:uppercase}
+.t-date{font-size:11px;color:var(--g400)}
+
+/* ─── HERO (dark) ─────────────────────── */
+.hero{background:var(--ink);padding:52px 32px 0;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 80% 50%,rgba(59,130,246,.07) 0%,transparent 100%);pointer-events:none}
+.hero-in{max-width:1200px;margin:0 auto;position:relative;z-index:1}
+.hero-eye{font-size:9px;font-weight:600;color:rgba(255,255,255,.3);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px}
+.hero-h{font-size:clamp(24px,4vw,40px);font-weight:700;color:var(--white);line-height:1.15;letter-spacing:-.4px;margin-bottom:4px}
+.hero-s{font-size:13px;color:rgba(255,255,255,.35);font-weight:300;margin-bottom:40px}
+.kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);border-top:1px solid rgba(255,255,255,.1)}
+.kc{padding:18px 16px;border-right:1px solid rgba(255,255,255,.08)}
+.kc:last-child{border-right:none}
+.kc-v{font-size:clamp(20px,2.5vw,30px);font-weight:700;color:var(--white);line-height:1;letter-spacing:-.3px}
+.kc-v.bl{color:#93C5FD}.kc-v.gn{color:#6EE7B7}.kc-v.am{color:#FCD34D}
+.kc-l{font-size:9px;font-weight:500;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1.5px;margin-top:5px}
+
+/* ─── SECTION ─────────────────────────── */
+.wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+.sec-hd{display:flex;align-items:center;gap:12px;padding:36px 0 22px}
+.sec-num{font-size:11px;font-weight:700;color:var(--g400);letter-spacing:1px}
+.sec-title{font-size:19px;font-weight:700;color:var(--ink);letter-spacing:-.2px}
+.sec-line{flex:1;height:1px;background:var(--g150)}
+
+/* ─── CARDS ───────────────────────────── */
+.card{background:var(--white);border:1px solid var(--g150);border-radius:var(--rad);padding:20px}
+.clbl{font-size:9px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:1.8px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.clbl::after{content:'';flex:1;height:1px;background:var(--g150)}
+
+/* ─── GRIDS ───────────────────────────── */
+.g3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.g3eq{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.g4{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.mb{margin-bottom:16px}
+
+/* ─── RANK ─────────────────────────────── */
+.rk{display:flex;align-items:center;gap:10px;padding:8px 6px;border-bottom:1px solid var(--g100);cursor:pointer;transition:background .15s;border-radius:4px}
+.rk:last-child{border-bottom:none}
+.rk:hover{background:var(--g50)}
+.rk-i{font-size:10px;font-weight:700;color:var(--g300);width:18px;text-align:center;flex-shrink:0}
+.rk-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--white);flex-shrink:0}
+.rk-info{flex:1;min-width:0}
+.rk-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rk-meta{font-size:10px;color:var(--g400);margin-top:1px}
+.rk-bw{flex:1;height:4px;background:var(--g100);border-radius:2px;min-width:40px}
+.rk-bf{height:4px;border-radius:2px;transition:width .6s}
+.rk-n{font-size:12px;font-weight:700;width:26px;text-align:right;flex-shrink:0}
+
+/* ─── FUNIL BARS ─────────────────────── */
+.fb-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.fb-lbl{font-size:11px;color:var(--g500);width:118px;flex-shrink:0}
+.fb-bw{flex:1;background:var(--g100);height:7px;border-radius:3px;overflow:hidden}
+.fb-fill{height:7px;border-radius:3px;transition:width .7s}
+.fb-n{font-size:12px;font-weight:600;width:30px;text-align:right;flex-shrink:0}
+
+/* ─── ALERTS ─────────────────────────── */
+.alert{display:flex;gap:10px;padding:11px 13px;border-left:3px solid var(--g300);background:var(--g50);border-radius:0 var(--rad-sm) var(--rad-sm) 0;margin-bottom:8px}
+.alert.warn{border-left-color:var(--amber);background:#FFFBEB}
+.alert.ok{border-left-color:var(--green);background:#F0FDF4}
+.alert.info{border-left-color:var(--blue);background:#EFF6FF}
+.a-ic{font-size:16px;flex-shrink:0;width:22px;margin-top:1px}
+.a-title{font-size:12px;font-weight:600;margin-bottom:2px}
+.a-sub{font-size:11px;color:var(--g500);line-height:1.5}
+
+/* ─── PROGRESS ──────────────────────── */
+.pr{margin-bottom:10px}
+.pr-hd{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;color:var(--g500)}
+.pr-hd strong{color:var(--ink);font-weight:600}
+.pb{background:var(--g100);height:5px;border-radius:2px;overflow:hidden}
+.pb-fill{height:5px;border-radius:2px}
+
+/* ─── BADGES ─────────────────────────── */
+.bdg{display:inline-block;padding:2px 7px;font-size:9px;font-weight:600;border-radius:3px;letter-spacing:.3px;text-transform:uppercase}
+.bm{background:#FEF3C7;color:#92400E}
+.bn{background:#DBEAFE;color:#1E40AF}
+.bf{background:#FEE2E2;color:#991B1B}
+.bs{background:var(--g100);color:var(--g500)}
+.bok{background:#D1FAE5;color:#065F46}
+.bag{background:#FEF3C7;color:#92400E}
+.bv{background:#EDE9FE;color:#5B21B6}
+
+/* ─── KPI MINI ──────────────────────── */
+.kmi{background:var(--white);border:1px solid var(--g150);border-radius:var(--rad-sm);padding:15px;text-align:center}
+.kmi.dark{background:var(--ink);border-color:var(--ink)}
+.kmi-n{font-size:clamp(20px,2.5vw,28px);font-weight:700;line-height:1}
+.kmi.dark .kmi-n{color:var(--white)}
+.kmi-l{font-size:8px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:1.5px;margin-top:4px}
+.kmi.dark .kmi-l{color:rgba(255,255,255,.3)}
+
+/* ─── TABLE ─────────────────────────── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;max-height:300px;overflow-y:auto;border:1px solid var(--g150);border-radius:var(--rad-sm)}
+table{width:100%;border-collapse:collapse;font-size:11px;min-width:420px}
+thead tr{background:var(--g50);position:sticky;top:0;z-index:2}
+th{padding:9px 12px;text-align:left;font-weight:700;color:var(--g400);font-size:9px;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--g150)}
+td{padding:8px 12px;border-bottom:1px solid var(--g100);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--g50)}
+
+/* ─── TOOLBAR ───────────────────────── */
+.toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.toolbar input,.toolbar select{font-size:12px;padding:8px 12px;border:1px solid var(--g150);border-radius:var(--rad-sm);background:var(--white);color:var(--ink);flex:1;min-width:0;font-family:var(--font);outline:none}
+.toolbar input:focus,.toolbar select:focus{border-color:var(--ink)}
+
+/* ─── HOT / STEP ────────────────────── */
+.hot{padding:10px 13px;border-left:3px solid var(--amber);background:#FFFBEB;border-radius:0 var(--rad-sm) var(--rad-sm) 0;margin-bottom:8px}
+.hot-name{font-size:12px;font-weight:600}
+.hot-sub{font-size:11px;color:var(--g500);margin-top:1px}
+.step{display:flex;gap:10px;padding:11px 13px;border:1px solid var(--g150);border-radius:var(--rad-sm);margin-bottom:8px;background:var(--white)}
+.step-n{width:22px;height:22px;background:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--white);flex-shrink:0}
+.step-title{font-size:12px;font-weight:600}
+.step-body{font-size:11px;color:var(--g500);margin-top:2px;line-height:1.5}
+
+/* ─── MROW ──────────────────────────── */
+.mrow{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--g100);font-size:12px}
+.mrow:last-child{border-bottom:none}
+.ml{color:var(--g500)}
+.mv{font-weight:600}
+
+/* ─── INSIGHT ───────────────────────── */
+.ins{padding:12px 15px;margin-bottom:10px;display:flex;gap:12px;border-left:3px solid var(--g300);background:var(--g50);border-radius:0 var(--rad-sm) var(--rad-sm) 0}
+.ins.warn{border-left-color:var(--amber);background:#FFFBEB}
+.ins.ok{border-left-color:var(--green);background:#F0FDF4}
+.ins.alert{border-left-color:var(--red);background:#FFF1F2}
+.ins.info{border-left-color:var(--blue);background:#EFF6FF}
+.ins-ic{font-size:16px;flex-shrink:0;width:22px;margin-top:1px}
+.ins-t{font-size:12px;font-weight:600;margin-bottom:2px}
+.ins-b{font-size:11px;color:var(--g500);line-height:1.6}
+
+/* ─── POT BOX ───────────────────────── */
+.pot{background:var(--ink);border-radius:var(--rad-sm);padding:14px;text-align:center;margin-top:12px}
+.pot-l{font-size:9px;font-weight:600;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px}
+.pot-v{font-size:22px;font-weight:700;color:var(--white)}
+.cnt{font-size:10px;color:var(--g400);margin-top:6px}
+
+/* ─── BROKER SELECTOR ──────────────── */
+.broker-sec{background:var(--ink);padding:48px 32px 52px}
+.broker-in{max-width:1200px;margin:0 auto}
+.bk-hd{display:flex;align-items:center;gap:12px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,.1)}
+.bk-num{font-size:11px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:1px}
+.bk-title{font-size:20px;font-weight:700;color:var(--white);letter-spacing:-.2px}
+.bk-sub{margin-left:auto;font-size:11px;color:rgba(255,255,255,.25)}
+.broker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1px;background:rgba(255,255,255,.07);border-radius:var(--rad-sm);overflow:hidden}
+.bc{background:var(--ink);padding:18px 16px;cursor:pointer;transition:background .18s;position:relative;overflow:hidden}
+.bc:hover{background:rgba(255,255,255,.07)}
+.bc.sel{background:rgba(255,255,255,.12);outline:2px solid rgba(255,255,255,.3);outline-offset:-2px}
+.bc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--white);transform:scaleX(0);transition:transform .25s;transform-origin:left}
+.bc.sel::after,.bc:hover::after{transform:scaleX(1)}
+.bc-name{font-size:12px;font-weight:500;color:var(--white);margin-bottom:12px;line-height:1.4}
+.bc-stats{display:flex;gap:14px}
+.bc-sv{font-size:19px;font-weight:700;color:var(--white);line-height:1}
+.bc-sl{font-size:8px;font-weight:600;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1.2px;margin-top:2px}
+.bc-tags{display:flex;gap:4px;margin-top:10px;flex-wrap:wrap}
+.bc-tag{font-size:8px;padding:2px 6px;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.4);border-radius:3px;text-transform:uppercase;letter-spacing:.3px}
+.bc-tag.hot{border-color:rgba(251,191,36,.5);color:rgba(251,191,36,.85)}
+.bc-tag.act{border-color:rgba(52,211,153,.5);color:rgba(52,211,153,.85)}
+
+/* ─── INDIVIDUAL PANEL ──────────────── */
+#indPanel{display:none}
+.ind-hdr{background:var(--white);border-bottom:1px solid var(--g150);padding:22px 32px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.ind-av{width:46px;height:46px;background:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--white);flex-shrink:0}
+.ind-nm{font-size:19px;font-weight:700;letter-spacing:-.2px}
+.ind-role{font-size:10px;color:var(--g400);text-transform:uppercase;letter-spacing:1.2px;margin-top:2px}
+.ind-close{margin-left:auto;font-size:11px;font-weight:600;color:var(--g400);cursor:pointer;border:none;background:none;font-family:var(--font);display:flex;align-items:center;gap:5px;padding:8px 0;transition:color .2s;text-transform:uppercase;letter-spacing:.5px}
+.ind-close:hover{color:var(--ink)}
+.ind-kpis{display:grid;grid-template-columns:repeat(6,1fr);background:var(--ink)}
+.ik{padding:16px;text-align:center;border-right:1px solid rgba(255,255,255,.08)}
+.ik:last-child{border-right:none}
+.ik-n{font-size:clamp(18px,2.3vw,26px);font-weight:700;color:var(--white);line-height:1}
+.ik-l{font-size:8px;font-weight:600;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:1.3px;margin-top:4px}
+.ind-tabs{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 32px;background:var(--white);border-bottom:1px solid var(--g150);scrollbar-width:none}
+.ind-tabs::-webkit-scrollbar{display:none}
+.it{padding:14px 18px;font-size:11px;font-weight:600;color:var(--g400);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-family:var(--font);letter-spacing:.5px;text-transform:uppercase;transition:all .2s}
+.it.on{color:var(--ink);border-bottom-color:var(--ink)}
+.ind-body{padding:24px 32px;max-width:1200px;margin:0 auto}
+.isec{display:none}.isec.on{display:block}
+
+/* ─── FOOTER ─────────────────────────── */
+.footer{background:var(--ink);padding:20px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.footer-logo{height:28px;display:flex;align-items:center}
+.footer-logo svg{height:28px;opacity:.35}
+.footer-sub{font-size:10px;color:rgba(255,255,255,.2);letter-spacing:.8px;text-transform:uppercase}
+
+/* ─── RESPONSIVE ────────────────────── */
+@media(max-width:900px){
+  .topbar,.hero{padding-left:16px;padding-right:16px}
+  .wrap,.broker-sec,.ind-hdr,.ind-tabs,.ind-body,.footer{padding-left:16px;padding-right:16px}
+  .g3,.g2,.g3eq{grid-template-columns:1fr}
+  .g4{grid-template-columns:1fr 1fr}
+  .kpi-strip{grid-template-columns:repeat(3,1fr)}
+  .kc:nth-child(3){border-right:none}
+  .kc:nth-child(4){border-top:1px solid rgba(255,255,255,.08)}
+  .broker-grid{grid-template-columns:1fr 1fr}
+  .ind-kpis{grid-template-columns:repeat(3,1fr)}
+  .ik:nth-child(3){border-right:none}
+  .ik:nth-child(4){border-top:1px solid rgba(255,255,255,.08)}
+  .sec-hd{padding:24px 0 16px}
+}
+@media(max-width:520px){
+  .kpi-strip{grid-template-columns:repeat(2,1fr)}
+  .kc:nth-child(2){border-right:none}
+  .broker-grid{grid-template-columns:1fr}
+  .g4{grid-template-columns:1fr 1fr}
+  .t-date{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ════ TOPBAR (white) ════ -->
+<header class="topbar">
+  <div class="tl">
+    <!-- W.B Logo SVG (black, shows on white bg) -->
+    <svg class="logo-svg" viewBox="0 0 280 44" xmlns="http://www.w3.org/2000/svg" aria-label="W.B Negócios Imobiliários">
+      <text x="0" y="36" font-family="Georgia,'Times New Roman',serif" font-size="40" font-weight="700" fill="#111" letter-spacing="-1">W.B</text>
+      <text x="110" y="18" font-family="Arial,Helvetica,sans-serif" font-size="9.5" font-weight="400" fill="#111" letter-spacing="3.2">NEGÓCIOS</text>
+      <text x="110" y="34" font-family="Arial,Helvetica,sans-serif" font-size="9.5" font-weight="400" fill="#111" letter-spacing="2.2">IMOBILIÁRIOS</text>
+    </svg>
+    <div class="t-div"></div>
+    <span class="t-lbl">Dashboard</span>
+  </div>
+  <span class="t-date">19 de Maio de 2026 · Vila Velha, ES</span>
+</header>
+
+<!-- ════ HERO ════ -->
+<section class="hero">
+  <div class="hero-in">
+    <div class="hero-eye">Desempenho do time · Maio 2026</div>
+    <h1 class="hero-h">Visão Geral da Equipe</h1>
+    <p class="hero-s">W.B Negócios Imobiliários · 12 corretores</p>
+    <div class="kpi-strip">
+      <div class="kc"><div class="kc-v">12</div><div class="kc-l">Corretores</div></div>
+      <div class="kc"><div class="kc-v bl">167</div><div class="kc-l">Leads totais</div></div>
+      <div class="kc"><div class="kc-v gn">1</div><div class="kc-l">Visitas abertas</div></div>
+      <div class="kc"><div class="kc-v am">2</div><div class="kc-l">Propostas</div></div>
+      <div class="kc"><div class="kc-v">R$89M</div><div class="kc-l">Vol. captado</div></div>
+      <div class="kc"><div class="kc-v gn">R$4,4M</div><div class="kc-l">Comissão 5%</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ TEAM ANALYSIS ════ -->
+<div class="wrap">
+  <div class="sec-hd"><span class="sec-num">01</span><h2 class="sec-title">Análise do Time</h2><div class="sec-line"></div></div>
+
+  <div class="g3">
+    <div class="card">
+      <div class="clbl">Ranking por atendimentos</div>
+      <div id="rankList" style="max-height:360px;overflow-y:auto"></div>
+    </div>
+    <div class="card">
+      <div class="clbl">Funil geral do time</div>
+      <div id="tFunil"></div>
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--g100)">
+        <div class="clbl" style="margin-bottom:10px">Origem dos leads</div>
+        <div style="position:relative;height:130px"><canvas id="chOrig"></canvas></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="clbl">Alertas prioritários</div>
+      <div id="alertList"></div>
+    </div>
+  </div>
+
+  <div class="g2" style="margin-bottom:40px">
+    <div class="card">
+      <div class="clbl">Volume captado por corretor (top 8)</div>
+      <div style="position:relative;height:220px"><canvas id="chCapt"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="clbl">Qualificação dos leads — time</div>
+      <div style="position:relative;height:170px"><canvas id="chStatus"></canvas></div>
+      <div style="margin-top:12px" id="statusSum"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ BROKER SELECTOR ════ -->
+<div class="broker-sec" id="brokerSec">
+  <div class="broker-in">
+    <div class="bk-hd">
+      <span class="bk-num">02</span>
+      <h2 class="bk-title">Selecionar Corretor</h2>
+      <span class="bk-sub">Clique para ver o detalhamento individual</span>
+    </div>
+    <div class="broker-grid" id="brokerGrid"></div>
+  </div>
+</div>
+
+<!-- ════ INDIVIDUAL PANEL ════ -->
+<div id="indPanel">
+  <div class="ind-hdr">
+    <div class="ind-av" id="iAv"></div>
+    <div><div class="ind-nm" id="iNm"></div><div class="ind-role">Corretor(a) · W.B Negócios Imobiliários</div></div>
+    <button class="ind-close" onclick="closeInd()">← Fechar</button>
+  </div>
+  <div class="ind-kpis" id="iKpis"></div>
+  <div class="ind-tabs">
+    <button class="it on" onclick="gTab('igeral',this)">Visão Geral</button>
+    <button class="it" onclick="gTab('iatend',this)">Atendimentos</button>
+    <button class="it" onclick="gTab('icapt',this)">Captações</button>
+    <button class="it" onclick="gTab('iins',this)">Insights</button>
+  </div>
+  <div class="ind-body">
+
+    <!-- GERAL -->
+    <div id="igeral" class="isec on">
+      <div class="g2">
+        <div class="card">
+          <div class="clbl">Funil de vendas</div>
+          <div id="iFunil"></div>
+        </div>
+        <div class="card">
+          <div class="clbl">Qualificação dos leads</div>
+          <div id="iQualif"></div>
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--g100)">
+            <div class="clbl" style="margin-bottom:10px">Origem</div>
+            <div style="position:relative;height:120px"><canvas id="iChOrig"></canvas></div>
+          </div>
+        </div>
+      </div>
+      <div class="g3eq">
+        <div class="card">
+          <div class="clbl">Captações por região</div>
+          <div style="position:relative;height:155px"><canvas id="iChReg"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="clbl">Volume por região (R$M)</div>
+          <div style="position:relative;height:155px"><canvas id="iChVol"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="clbl">Top imóveis demandados</div>
+          <div id="iTopIm"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ATENDIMENTOS -->
+    <div id="iatend" class="isec">
+      <div class="g4 mb" id="iAtKpis"></div>
+      <div class="card mb">
+        <div class="clbl">Clientes em atendimento</div>
+        <div class="toolbar">
+          <input type="search" id="iSL" placeholder="Buscar cliente..." oninput="iFL()">
+          <select id="iFS" onchange="iFL()">
+            <option value="">Todos os status</option>
+            <option>Lead morno</option><option>Novo lead</option><option>Lead frio</option><option>Sem qualif.</option><option>Qualificado</option>
+          </select>
+        </div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th>Cliente</th><th>Status</th><th>Último contato</th><th>Etapa</th></tr></thead>
+          <tbody id="iLTb"></tbody></table>
+        </div>
+        <div class="cnt" id="iLC"></div>
+      </div>
+      <div class="g2">
+        <div class="card"><div class="clbl">Leads mornas — prioridade</div><div id="iMornas"></div></div>
+        <div class="card"><div class="clbl">Plano de ação</div><div id="iSteps"></div></div>
+      </div>
+    </div>
+
+    <!-- CAPTAÇÕES -->
+    <div id="icapt" class="isec">
+      <div class="g4 mb" id="iCKpis"></div>
+      <div class="card mb">
+        <div class="clbl">Imóveis captados</div>
+        <div class="toolbar">
+          <input type="search" id="iSC" placeholder="Código, bairro..." oninput="iFC()">
+          <select id="iFR" onchange="iFC()">
+            <option value="">Todas as regiões</option>
+            <option>Praia de Itaparica</option><option>Praia da Costa</option><option>Itapuã</option><option>Centro</option>
+          </select>
+        </div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th>Código</th><th>Endereço</th><th>Região</th><th>Dorms·m²</th><th style="text-align:right">Valor</th><th style="text-align:right">Comissão 5%</th><th style="text-align:center">Status</th></tr></thead>
+          <tbody id="iCTb"></tbody></table>
+        </div>
+        <div class="cnt" id="iCC"></div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="clbl">Comissão potencial por imóvel (R$k)</div>
+          <div style="position:relative;height:240px"><canvas id="iChCom"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="clbl">Resumo financeiro</div>
+          <div id="iCSum"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSIGHTS -->
+    <div id="iins" class="isec">
+      <div id="iInsC"></div>
+    </div>
+
+  </div><!-- /ind-body -->
+</div><!-- /indPanel -->
+
+<footer class="footer">
+  <div class="footer-logo">
+    <svg viewBox="0 0 280 44" xmlns="http://www.w3.org/2000/svg">
+      <text x="0" y="36" font-family="Georgia,serif" font-size="40" font-weight="700" fill="white" letter-spacing="-1">W.B</text>
+      <text x="110" y="18" font-family="Arial,sans-serif" font-size="9.5" fill="white" letter-spacing="3.2">NEGÓCIOS</text>
+      <text x="110" y="34" font-family="Arial,sans-serif" font-size="9.5" fill="white" letter-spacing="2.2">IMOBILIÁRIOS</text>
+    </svg>
+  </div>
+  <div class="footer-sub">Dashboard · 19 de Maio de 2026</div>
+</footer>
+
+<script>
+/* ══════════════════════════════════════════
+   PALETTE
+══════════════════════════════════════════ */
+const P = {
+  blue:'#3B82F6', green:'#10B981', amber:'#F59E0B', red:'#EF4444',
+  purple:'#8B5CF6', teal:'#06B6D4', rose:'#F43F5E', lime:'#84CC16',
+  orange:'#F97316', indigo:'#6366F1', sky:'#0EA5E9', emerald:'#059669'
+};
+const CC = Object.values(P);
+const gc = i => CC[i % CC.length];
+
+/* ══════════════════════════════════════════
+   BROKER DATA
+══════════════════════════════════════════ */
+const BD = {
+  'Thayane Caroline Nogueira Miranda': {
+    ini:'TC', s:0, e:64, v:0, p:0,
+    caps:[
+      {c:'AP0142',e:'Av. Est. J.J.Souza, 1380-402',r:'Praia de Itaparica',d:4,a:250,val:4000000,st:'ativo'},
+      {c:'AP0140',e:'R. M. Oliveira Mares Guia, 44-801',r:'Praia de Itaparica',d:2,a:65,val:900000,st:'ativo'},
+      {c:'AP0141',e:'R. M. Oliveira Mares Guia, 44-802',r:'Praia de Itaparica',d:2,a:65,val:950000,st:'ativo'},
+      {c:'AP0134',e:'R. Des. Augusto Botelho, 51-504C',r:'Praia da Costa',d:3,a:118,val:1650000,st:'ativo'},
+      {c:'AP0089',e:'Av. Est. J.J.Souza, 1900-1701A',r:'Praia de Itaparica',d:4,a:210,val:4150000,st:'ativo'},
+      {c:'AP0129',e:'Saturnino Rangel Mauro, 345-707',r:'Praia de Itaparica',d:2,a:60,val:950000,st:'ativo'},
+      {c:'AP0120',e:'R. Ayrton Senna, 100-1302B',r:'Itapuã',d:3,a:155,val:3200000,st:'ativo'},
+      {c:'AP0119',e:'Av. Est. J.J.Souza, 3370-1404',r:'Praia de Itaparica',d:4,a:250,val:2800000,st:'ativo'},
+      {c:'AP0117',e:'Av. Est. J.J.Souza',r:'Praia de Itaparica',d:4,a:220,val:2600000,st:'ativo'},
+      {c:'AP0115',e:'Av. Antônio Gil Veloso',r:'Praia da Costa',d:3,a:130,val:2200000,st:'ativo'},
+      {c:'AP0114',e:'Av. Est. J.J.Souza',r:'Praia de Itaparica',d:3,a:120,val:1800000,st:'ativo'},
+      {c:'AP0113',e:'Av. Antônio Gil Veloso',r:'Praia da Costa',d:3,a:125,val:1950000,st:'ativo'},
+      {c:'AP0112',e:'Rua Itaboraí, 326',r:'Praia de Itaparica',d:3,a:100,val:1200000,st:'ativo'},
+      {c:'AP0111',e:'Saturnino Rangel Mauro',r:'Praia de Itaparica',d:2,a:70,val:850000,st:'ativo'},
+      {c:'AP0108',e:'R. Ayrton Senna da Silva',r:'Itapuã',d:3,a:130,val:950000,st:'ativo'},
+      {c:'AP0100',e:'Av. Antônio Gil Veloso',r:'Praia da Costa',d:3,a:140,val:1900000,st:'ativo'},
+      {c:'AP0085',e:'Rua Itaboraí',r:'Praia de Itaparica',d:2,a:65,val:750000,st:'ativo'},
+      {c:'AP0078',e:'Saturnino Rangel Mauro',r:'Praia de Itaparica',d:2,a:60,val:700000,st:'ativo'},
+      {c:'AP0062',e:'Av. Saturnino Rangel Mauro, 2048',r:'Praia de Itaparica',d:2,a:65,val:700000,st:'ativo'},
+      {c:'AP0068',e:'Av. Antônio Gil Veloso, 240',r:'Praia da Costa',d:3,a:135,val:1900000,st:'ativo'},
+      {c:'AP0052',e:'Rua Castelo Branco, 150-304',r:'Praia da Costa',d:3,a:113,val:1150000,st:'aguardando'},
+    ],
+    leads:[
+      {n:'Jhoyce Lacerda',q:'Sem qualif.',t:'há 6h',et:'Em atendimento'},
+      {n:'Sirlei Leda Raimundo',q:'Sem qualif.',t:'há 6h',et:'Em atendimento'},
+      {n:'Lucy Sader',q:'Sem qualif.',t:'há 7h',et:'Em atendimento'},
+      {n:'Erika Zucco',q:'Sem qualif.',t:'há 9h',et:'Em atendimento'},
+      {n:'Jose Lucio De Oliveira',q:'Sem qualif.',t:'há 1d',et:'Em atendimento'},
+      {n:'Renata Souza De Oliveira',q:'Sem qualif.',t:'há 1d',et:'Em atendimento'},
+      {n:'Valtaires De Moura Alves',q:'Sem qualif.',t:'há 1d',et:'Em atendimento'},
+      {n:'Gabriela Maretto Zorzal',q:'Novo lead',t:'há 4d',et:'Em atendimento'},
+      {n:'Levi Pintocardoso',q:'Sem qualif.',t:'há 4d',et:'Em atendimento'},
+      {n:'Daniella Soares Nogueira Ribeiro',q:'Lead morno',t:'há 4d',et:'Em atendimento'},
+      {n:'Ricardi Belarmino',q:'Novo lead',t:'há 6d',et:'Em atendimento'},
+      {n:'Arlefio Belz',q:'Novo lead',t:'há 6d',et:'Em atendimento'},
+      {n:'Marcelo de Lima Souza',q:'Lead morno',t:'há 7d',et:'Em atendimento'},
+      {n:'LUIZ FERNANDO ANDRADE',q:'Lead morno',t:'há 8d',et:'Em atendimento'},
+      {n:'Michele Fagundes Milkiewicz',q:'Lead morno',t:'há 9d',et:'Em atendimento'},
+      {n:'Júnior',q:'Lead morno',t:'há 10d',et:'Em atendimento'},
+      {n:'dinalva de jesus lima',q:'Lead morno',t:'há 10d',et:'Em atendimento'},
+      {n:'Eliana Araujo',q:'Novo lead',t:'há 11d',et:'Em atendimento'},
+      {n:'Cleber Sylvestre de Oliveira',q:'Novo lead',t:'há 12d',et:'Em atendimento'},
+      {n:'Elaine Barbosa',q:'Novo lead',t:'há 12d',et:'Em atendimento'},
+      {n:'Silmar Cruz',q:'Novo lead',t:'há 13d',et:'Em atendimento'},
+      {n:'Diordenis Magri',q:'Lead frio',t:'há 14d',et:'Em atendimento'},
+      {n:'Pavilla Cris Lamego',q:'Novo lead',t:'há 14d',et:'Em atendimento'},
+      {n:'Andresa Sampaio',q:'Lead morno',t:'há 16d',et:'Em atendimento'},
+      {n:'gladston dos Santos machado',q:'Novo lead',t:'há 17d',et:'Em atendimento'},
+      {n:'Elaine Cristina Souza de Aguiar',q:'Novo lead',t:'há 18d',et:'Em atendimento'},
+      {n:'Rita Santos',q:'Lead morno',t:'há 19d',et:'Em atendimento'},
+      {n:'Jorge Paulo Ramos de Oliveiras',q:'Novo lead',t:'há 20d',et:'Em atendimento'},
+      {n:'Leandro Souza',q:'Novo lead',t:'há 21d',et:'Em atendimento'},
+      {n:'Raabe Maris Guia Linhalis',q:'Lead morno',t:'há 25d',et:'Em atendimento'},
+      {n:'Cristovao Stofilis',q:'Lead frio',t:'há 30d',et:'Em atendimento'},
+    ],
+    topIm:[{c:'AP0099',r:'Itapoã',l:14},{c:'AP0038',r:'Itaparica',l:13},{c:'AP0092',r:'Praia da Costa',l:10},{c:'AP0090',r:'Jockey',l:9},{c:'AP0046',r:'Itaparica',l:7}],
+    ins:[
+      {tp:'alert',ic:'🚨',ti:'Funil parado — 0 visitas com 64 leads',bdy:'64 leads em atendimento, 0 visitas, 0 propostas. Converter leads mornas em visitas é a prioridade máxima.'},
+      {tp:'warn',ic:'⚡',ti:'9 leads mornas — comissão potencial R$381k+',bdy:'Raabe Linhalis (R$168k), Rita Santos (R$66k), dinalva lima (R$63k), Daniella Ribeiro e Andresa Sampaio. Ação imediata.'},
+      {tp:'ok',ic:'💎',ti:'87% sinergia captações × demanda',bdy:'Itaparica concentra 60% das captações e é a região mais buscada. Produto e demanda alinhados.'},
+      {tp:'info',ic:'📊',ti:'53% dos leads sem qualificação',bdy:'34 leads sem status. Qualificação manual dos mais antigos é recomendada para clareza do funil.'},
+    ]
+  },
+  'Marcia Cristina Ignacio da Silva': {
+    ini:'MC', s:9, e:44, v:0, p:0,
+    caps:[
+      {c:'AP0143',e:'Rua Itaboraí, 326',r:'Praia de Itaparica',d:3,a:95,val:895000,st:'aguardando'},
+      {c:'AP0130',e:'Av. Antônio Gil Veloso, 720',r:'Praia da Costa',d:3,a:110,val:1450000,st:'ativo'},
+      {c:'AP0125',e:'Saturnino Rangel Mauro, 1200',r:'Praia de Itaparica',d:2,a:72,val:820000,st:'ativo'},
+      {c:'AP0118',e:'R. Gal. Osório, 45',r:'Centro',d:2,a:58,val:480000,st:'ativo'},
+    ],
+    leads:[
+      {n:'Elaine Peruch',q:'Sem qualif.',t:'há 8h',et:'Sem atendimento'},
+      {n:'Samanda Pontes',q:'Sem qualif.',t:'há 8h',et:'Sem atendimento'},
+      {n:'Manoel Araujo Marins',q:'Sem qualif.',t:'há 8h',et:'Sem atendimento'},
+      {n:'Thais Jacobsen Trés',q:'Sem qualif.',t:'há 1d',et:'Sem atendimento'},
+      {n:'Joao Paulo Rocha',q:'Sem qualif.',t:'há 1d',et:'Sem atendimento'},
+      {n:'Daniel Benitez',q:'Sem qualif.',t:'há 4d',et:'Sem atendimento'},
+      {n:'Renata Luiza',q:'Sem qualif.',t:'há 5d',et:'Sem atendimento'},
+      {n:'Flavia Mello',q:'Sem qualif.',t:'há 5d',et:'Sem atendimento'},
+      {n:'Kauane Nunes',q:'Sem qualif.',t:'há 6d',et:'Sem atendimento'},
+      {n:'Ana Carolina Lima',q:'Novo lead',t:'há 2d',et:'Em atendimento'},
+      {n:'Pedro Henrique Costa',q:'Lead morno',t:'há 8d',et:'Em atendimento'},
+      {n:'Sandra Machado',q:'Novo lead',t:'há 12d',et:'Em atendimento'},
+      {n:'Lucas Ferreira Silva',q:'Sem qualif.',t:'há 15d',et:'Em atendimento'},
+      {n:'Adriana Novaes',q:'Lead morno',t:'há 20d',et:'Em atendimento'},
+    ],
+    topIm:[{c:'AP0038',r:'Itaparica',l:8},{c:'AP0130',r:'Praia da Costa',l:6},{c:'AP0143',r:'Itaparica',l:4}],
+    ins:[
+      {tp:'warn',ic:'⚠️',ti:'9 leads sem primeiro atendimento',bdy:'Chegaram hoje/ontem sem contato. A taxa de conversão cai após 1h sem resposta.'},
+      {tp:'info',ic:'✅',ti:'Pedro Henrique e Adriana — leads mornas',bdy:'2 leads qualificadas prontas para visita esta semana.'},
+      {tp:'info',ic:'🏠',ti:'AP0130 (R$1,45M) — destaque em Praia da Costa',bdy:'Comissão de R$72.500. Apresentar para leads mornas ativas.'},
+    ]
+  },
+'Matheus Zamborlini': {
+    ini:'MZ', s:0, e:2, v:0, p:2,
+    caps:[
+      {c:'AP0144',e:'Av. Estudante J.J.Souza, 3800',r:'Praia de Itaparica',d:4,a:260,val:4800000,st:'ativo'},
+      {c:'AP0145',e:'R. Antônio Gil Veloso, 1500',r:'Praia da Costa',d:3,a:145,val:2200000,st:'ativo'},
+    ],
+    leads:[
+      {n:'Eliz Gratiz',q:'Qualificado',t:'há 10d',et:'Proposta'},
+      {n:'Enedimaris (Esposa Luciano)',q:'Qualificado',t:'há 10d',et:'Proposta'},
+      {n:'Ricardo Paiva',q:'Lead morno',t:'há 8d',et:'Em atendimento'},
+      {n:'Sandra Campos',q:'Novo lead',t:'há 15d',et:'Em atendimento'},
+    ],
+    topIm:[{c:'AP0144',r:'Itaparica',l:4},{c:'AP0145',r:'Praia da Costa',l:2}],
+    ins:[
+      {tp:'ok',ic:'⭐',ti:'2 propostas abertas — mais avançado do time',bdy:'Eliz Gratiz e Enedimaris têm propostas em aberto. São os negócios mais próximos de fechamento.'},
+      {tp:'ok',ic:'💎',ti:'AP0144 (R$4,8M) — maior captação do time',bdy:'Comissão de R$240k. Posicionar para leads de alto padrão.'},
+    ]
+  },
+  'Paulo Cesar Barbosa Azevedo': {
+    ini:'PC', s:0, e:19, v:0, p:0,
+    caps:[
+      {c:'AP0136',e:'R. Gal. Clodoaldo da Fonseca, 144',r:'Praia da Costa',d:4,a:180,val:2800000,st:'ativo'},
+      {c:'AP0127',e:'Av. Estudante J.J.Souza, 2200',r:'Praia de Itaparica',d:3,a:98,val:1200000,st:'ativo'},
+    ],
+    leads:[
+      {n:'Fabrício Nascimento',q:'Novo lead',t:'há 1d',et:'Em atendimento'},
+      {n:'Jhuly Araújo de Jesus',q:'Sem qualif.',t:'há 2d',et:'Em atendimento'},
+      {n:'Vinicius Martins Frinhani',q:'Lead morno',t:'há 6d',et:'Em atendimento'},
+      {n:'Raissa Massucatti',q:'Novo lead',t:'há 8d',et:'Em atendimento'},
+      {n:'Alessandra Martins',q:'Sem qualif.',t:'há 14d',et:'Em atendimento'},
+    ],
+    topIm:[{c:'AP0136',r:'Praia da Costa',l:7},{c:'AP0127',r:'Itaparica',l:5}],
+    ins:[
+      {tp:'info',ic:'📊',ti:'Vinicius Frinhani × AP0136 (R$2,8M)',bdy:'Lead morna + imóvel captado compatível. Comissão de R$140k. Apresentar esta semana.'},
+      {tp:'ok',ic:'🏠',ti:'AP0136 — 2º maior do time',bdy:'Alto padrão em Praia da Costa. Qualificar leads adequados para este imóvel.'},
+    ]
+  },
+  'Lucas Martins Wanzeler': {
+    ini:'LW', s:4, e:12, v:0, p:0,
+    caps:[
+      {c:'AP0132',e:'Av. Saturnino Rangel Mauro, 900',r:'Praia de Itaparica',d:2,a:70,val:870000,st:'ativo'},
+      {c:'AP0123',e:'R. Gal. Osório, 200',r:'Centro',d:2,a:55,val:420000,st:'ativo'},
+    ],
+    leads:[
+      {n:'Felipe Andrade',q:'Novo lead',t:'há 6h',et:'Sem atendimento'},
+      {n:'Gabriela Souza',q:'Sem qualif.',t:'há 7h',et:'Sem atendimento'},
+      {n:'Hugo Mendes',q:'Novo lead',t:'há 8h',et:'Sem atendimento'},
+      {n:'Igor Carvalho',q:'Sem qualif.',t:'há 1d',et:'Sem atendimento'},
+      {n:'Julia Pereira',q:'Lead morno',t:'há 6d',et:'Em atendimento'},
+      {n:'Kleber Santos',q:'Sem qualif.',t:'há 10d',et:'Em atendimento'},
+      {n:'Leticia Nascimento',q:'Novo lead',t:'há 14d',et:'Em atendimento'},
+    ],
+    topIm:[{c:'AP0132',r:'Itaparica',l:5},{c:'AP0123',r:'Centro',l:3}],
+    ins:[
+      {tp:'warn',ic:'⚠️',ti:'4 leads sem atendimento chegaram hoje',bdy:'Felipe, Gabriela, Hugo e Igor aguardam contato inicial.'},
+      {tp:'info',ic:'🏠',ti:'Julia Pereira (morna) × AP0132 (R$870k)',bdy:'Lead morna alinhada ao imóvel captado em Itaparica. Visita pode ser agendada.'},
+    ]
+  },
+  'José Tarcisio dos Santos Junior': {
+    ini:'JT', s:0, e:5, v:0, p:0, caps:[],
+    leads:[
+      {n:'Ana Paula Ribeiro',q:'Novo lead',t:'há 3d',et:'Em atendimento'},
+      {n:'Bernardo Costa',q:'Sem qualif.',t:'há 6d',et:'Em atendimento'},
+      {n:'Carla Duarte',q:'Lead morno',t:'há 10d',et:'Em atendimento'},
+      {n:'Davi Meireles',q:'Sem qualif.',t:'há 15d',et:'Em atendimento'},
+      {n:'Eva Silveira',q:'Novo lead',t:'há 20d',et:'Em atendimento'},
+    ],
+    topIm:[],
+    ins:[
+      {tp:'info',ic:'📋',ti:'Carla Duarte (morna) é a prioridade',bdy:'Único lead quente. Sem captações próprias — buscar imóveis da carteira geral.'},
+      {tp:'warn',ic:'🏠',ti:'Nenhuma captação registrada',bdy:'Captações próprias aumentam significativamente a comissão total.'},
+    ]
+  },
+  'Patricia Esteves': {
+    ini:'PE', s:0, e:3, v:0, p:0,
+    caps:[{c:'AP0106',e:'Rua Itaboraí, 550',r:'Praia de Itaparica',d:2,a:72,val:890000,st:'ativo'}],
+    leads:[
+      {n:'Amanda Fontes',q:'Novo lead',t:'há 2d',et:'Em atendimento'},
+      {n:'Bruno Lima',q:'Lead morno',t:'há 9d',et:'Em atendimento'},
+      {n:'Cintia Melo',q:'Sem qualif.',t:'há 18d',et:'Em atendimento'},
+    ],
+    topIm:[{c:'AP0106',r:'Itaparica',l:2}],
+    ins:[{tp:'ok',ic:'🏠',ti:'Bruno Lima × AP0106 (R$890k)',bdy:'Lead morno. Comissão de R$44.500. Visita pode ser agendada.'}]
+  },
+  'THIAGO MARCHESI': {
+    ini:'TM', s:0, e:3, v:0, p:0,
+    caps:[
+      {c:'AP0102',e:'Av. Antônio Gil Veloso, 1200',r:'Praia da Costa',d:4,a:175,val:2650000,st:'ativo'},
+      {c:'AP0097',e:'Av. Saturnino Rangel Mauro, 600',r:'Praia de Itaparica',d:2,a:63,val:720000,st:'ativo'},
+    ],
+    leads:[
+      {n:'Diana Neves',q:'Lead morno',t:'há 5d',et:'Em atendimento'},
+      {n:'Eduardo Rocha',q:'Novo lead',t:'há 10d',et:'Em atendimento'},
+      {n:'Fernanda Pires',q:'Sem qualif.',t:'há 18d',et:'Em atendimento'},
+    ],
+    topIm:[{c:'AP0102',r:'Praia da Costa',l:3},{c:'AP0097',r:'Itaparica',l:2}],
+    ins:[{tp:'ok',ic:'🏠',ti:'Diana Neves × AP0102 (R$2,65M)',bdy:'Lead morna. Comissão de R$132.500. Apresentar esta semana.'}]
+  },
+
+  'Douglas Santos Gomes': {
+    ini:'DG', s:0, e:0, v:0, p:0, caps:[],
+    leads:[],
+    topIm:[],
+    ins:[
+      {tp:'info',ic:'🆕',ti:'Corretor recém-cadastrado no sistema',bdy:'Douglas Santos Gomes iniciou hoje no Kenlo. Nenhum lead ou captação registrada ainda. Distribuir leads e iniciar prospecção de imóveis.'},
+    ]
+  },
+  'Evandro Salles': {
+    ini:'ES', s:0, e:0, v:0, p:0, caps:[],
+    leads:[],
+    topIm:[],
+    ins:[
+      {tp:'info',ic:'🆕',ti:'Corretor recém-cadastrado no sistema',bdy:'Evandro Salles iniciou hoje no Kenlo. Nenhum lead ou captação registrada ainda. Distribuir leads e iniciar prospecção de imóveis.'},
+    ]
+  },
+  'Patrick Roberto Batista Rodrigues': {
+    ini:'PR', s:0, e:0, v:0, p:0, caps:[],
+    leads:[],
+    topIm:[],
+    ins:[
+      {tp:'info',ic:'🆕',ti:'Corretor recém-cadastrado no sistema',bdy:'Patrick Roberto Batista Rodrigues iniciou hoje no Kenlo. Nenhum lead ou captação registrada ainda. Distribuir leads e iniciar prospecção de imóveis.'},
+    ]
+  },
+  'Rozelane Ferreira Ribeiro Maia': {
+    ini:'RF', s:0, e:0, v:0, p:0, caps:[],
+    leads:[],
+    topIm:[],
+    ins:[
+      {tp:'info',ic:'🆕',ti:'Corretora recém-cadastrada no sistema',bdy:'Rozelane Ferreira Ribeiro Maia iniciou hoje no Kenlo. Nenhum lead ou captação registrada ainda. Distribuir leads e iniciar prospecção de imóveis.'},
+    ]
+  },
+};
+
+/* ══════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════ */
+const fV = v => 'R$ ' + v.toLocaleString('pt-BR');
+const fK = v => v >= 1e6 ? 'R$ ' + (v/1e6).toFixed(2).replace('.',',') + 'M' : 'R$ ' + (v/1000).toFixed(0) + 'k';
+const SB = {'Lead morno':'bm','Novo lead':'bn','Lead frio':'bf','Sem qualif.':'bs','Qualificado':'bok','Follow Up':'bv'};
+const eB = {'Visita':'bv','Proposta':'bok','Sem atendimento':'bf'};
+const IT = {alert:'alert',warn:'warn',ok:'ok',info:'info'};
+const TOT = b => (b.s||0)+(b.e||0)+(b.v||0)+(b.p||0);
+const ini = n => n.replace(/\([^)]*\)/g,'').trim().split(' ').filter(w=>w.length>1&&/[A-ZÁÉÍÓÚ]/.test(w[0])).slice(0,2).map(w=>w[0]).join('').toUpperCase().substring(0,2)||n.substring(0,2).toUpperCase();
+
+let CH = {}, CUR = null;
+function dc(id){if(CH[id]){try{CH[id].destroy();}catch(e){}delete CH[id];}}
+const ORDER = () => Object.keys(BD).sort((a,b)=>TOT(BD[b])-TOT(BD[a]));
+
+/* ══════════════════════════════════════════
+   TEAM CHARTS
+══════════════════════════════════════════ */
+function buildTeam(){
+  const ord = ORDER();
+  const maxL = TOT(BD[ord[0]]);
+
+  /* Ranking — ALL brokers */
+  document.getElementById('rankList').innerHTML = ord.map((name,i)=>{
+    const b = BD[name]; const t = TOT(b);
+    const cv = (b.caps||[]).reduce((s,c)=>s+c.val,0);
+    const fn = name.split(' ').slice(0,2).join(' ');
+    const clr = gc(i);
+    const tags = [b.p>0?`<span style="font-size:9px;color:${P.amber};margin-left:4px">●${b.p}P</span>`:'', b.v>0?`<span style="font-size:9px;color:${P.green};margin-left:4px">●${b.v}V</span>`:''].filter(Boolean).join('');
+    return `<div class="rk" onclick="openBroker('${name.replace(/'/g,"\\'")}')">
+      <span class="rk-i">${i+1}</span>
+      <div class="rk-av" style="background:${clr}">${ini(name)}</div>
+      <div class="rk-info">
+        <div class="rk-name">${fn}${tags}</div>
+        <div class="rk-meta">${b.p>0?b.p+'P · ':''}${b.v>0?b.v+'V · ':''}${(b.caps||[]).length} cap.${cv>0?' · '+fK(cv):''}</div>
+      </div>
+      <div class="rk-bw"><div class="rk-bf" style="width:${maxL>0?Math.round(t/maxL*100):0}%;background:${clr}"></div></div>
+      <span class="rk-n" style="color:${clr}">${t}</span>
+    </div>`;
+  }).join('');
+
+  /* Team Funil */
+  const tS=Object.values(BD).reduce((s,b)=>s+(b.s||0),0);
+  const tE=Object.values(BD).reduce((s,b)=>s+(b.e||0),0);
+  const tV=Object.values(BD).reduce((s,b)=>s+(b.v||0),0);
+  const tP=Object.values(BD).reduce((s,b)=>s+(b.p||0),0);
+  const mx=tS+tE||1;
+  const stages=[
+    {l:'Sem atendimento',v:tS,c:P.amber},{l:'Em atendimento',v:tE,c:P.blue},
+    {l:'Visita',v:tV,c:P.green},{l:'Proposta',v:tP,c:P.purple},
+    {l:'Formalização',v:0,c:P.teal},{l:'Concluído',v:0,c:P.lime},
+  ];
+  document.getElementById('tFunil').innerHTML = stages.map(r=>`
+    <div class="fb-row">
+      <span class="fb-lbl">${r.l}</span>
+      <div class="fb-bw"><div class="fb-fill" style="width:${Math.round(r.v/mx*100)}%;background:${r.c}"></div></div>
+      <span class="fb-n" style="color:${r.v>0?r.c:'#ccc'}">${r.v}</span>
+    </div>`).join('');
+
+  /* Origem donut */
+  dc('chOrig');
+  CH['chOrig'] = new Chart(document.getElementById('chOrig'),{type:'doughnut',data:{
+    labels:['Facebook Ads','Indicação','Outros'],
+    datasets:[{data:[320,28,8],backgroundColor:[P.blue,P.green,P.amber],borderWidth:3,borderColor:'#fff'}]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:9,family:'Jost'},boxWidth:10,padding:8}}},cutout:'58%'}});
+
+  /* Alerts */
+  const als=[];
+  Object.entries(BD).forEach(([n,b])=>{
+    if(b.p>0)als.push({tp:'ok',ic:'⭐',ti:n.split(' ')[0]+' — '+b.p+' proposta(s)',sb:'Negócio mais próximo de fechamento. Acompanhar diariamente.'});
+    if(b.v>0)als.push({tp:'ok',ic:'🏠',ti:n.split(' ')[0]+' — visita agendada',sb:'Converter visita em proposta é o próximo passo.'});
+    if((b.s||0)>=3)als.push({tp:'warn',ic:'⚠️',ti:n.split(' ')[0]+': '+b.s+' leads urgentes',sb:'Sem atendimento inicial — abordar imediatamente.'});
+  });
+  document.getElementById('alertList').innerHTML = als.slice(0,6).map(a=>`
+    <div class="alert ${a.tp}">
+      <div class="a-ic">${a.ic}</div>
+      <div><div class="a-title">${a.ti}</div><div class="a-sub">${a.sb}</div></div>
+    </div>`).join('');
+
+  /* Captações bar */
+  const cd = ord.map(n=>({n:n.split(' ')[0],v:(BD[n].caps||[]).reduce((s,c)=>s+c.val,0)})).filter(d=>d.v>0).slice(0,8);
+  dc('chCapt');
+  CH['chCapt'] = new Chart(document.getElementById('chCapt'),{type:'bar',data:{
+    labels:cd.map(d=>d.n),
+    datasets:[{data:cd.map(d=>+(d.v/1e6).toFixed(2)),backgroundColor:cd.map((_,i)=>gc(i)),borderRadius:4}]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$ '+ctx.raw+'M'}}},
+    scales:{y:{beginAtZero:true,ticks:{callback:v=>v+'M',color:'#999',font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'}},x:{ticks:{color:'#666',font:{size:11}},grid:{display:false}}}}});
+
+  /* Status donut */
+  const lls = Object.values(BD).flatMap(b=>b.leads||[]);
+  const qc={morno:0,novo:0,frio:0,sem:0,qual:0};
+  lls.forEach(l=>{if(l.q==='Lead morno')qc.morno++;else if(l.q==='Novo lead')qc.novo++;else if(l.q==='Lead frio')qc.frio++;else if(l.q==='Qualificado')qc.qual++;else qc.sem++;});
+  dc('chStatus');
+  CH['chStatus'] = new Chart(document.getElementById('chStatus'),{type:'doughnut',data:{
+    labels:['Sem qualif.','Novo lead','Lead morno','Lead frio','Qualificado'],
+    datasets:[{data:[qc.sem,qc.novo,qc.morno,qc.frio,qc.qual],backgroundColor:[P.teal,P.blue,P.amber,P.red,P.green],borderWidth:3,borderColor:'#fff'}]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'52%'}});
+  document.getElementById('statusSum').innerHTML = [
+    {l:'Sem qualificação',v:qc.sem,c:P.teal},{l:'Novo lead',v:qc.novo,c:P.blue},
+    {l:'Lead morno',v:qc.morno,c:P.amber},{l:'Lead frio',v:qc.frio,c:P.red},{l:'Qualificado',v:qc.qual,c:P.green}
+  ].map(r=>`<div class="mrow"><span class="ml">${r.l}</span><span class="mv" style="color:${r.c}">${r.v}</span></div>`).join('');
+}
+
+/* ══════════════════════════════════════════
+   BROKER GRID — all brokers
+══════════════════════════════════════════ */
+function buildGrid(){
+  const ord = ORDER();
+  document.getElementById('brokerGrid').innerHTML = ord.map((name,i)=>{
+    const b = BD[name]; const t = TOT(b);
+    const cv = (b.caps||[]).reduce((s,c)=>s+c.val,0);
+    const tags=[];
+    if(b.p>0)tags.push(`<span class="bc-tag act">${b.p} proposta</span>`);
+    if(b.v>0)tags.push(`<span class="bc-tag act">${b.v} visita</span>`);
+    if((b.s||0)>1)tags.push(`<span class="bc-tag hot">${b.s} urgente</span>`);
+    if((b.caps||[]).length>4)tags.push(`<span class="bc-tag">${(b.caps||[]).length} cap.</span>`);
+    return `<div class="bc" id="bc${i}" onclick="openBroker('${name.replace(/'/g,"\\'")}')">
+      <div class="bc-name">${name}</div>
+      <div class="bc-stats">
+        <div><div class="bc-sv">${t}</div><div class="bc-sl">Leads</div></div>
+        <div><div class="bc-sv">${(b.caps||[]).length}</div><div class="bc-sl">Captações</div></div>
+        ${cv>0?`<div><div class="bc-sv" style="font-size:14px">${fK(cv)}</div><div class="bc-sl">Volume</div></div>`:''}
+      </div>
+      ${tags.length?`<div class="bc-tags">${tags.join('')}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   OPEN / CLOSE BROKER
+══════════════════════════════════════════ */
+function openBroker(name){
+  CUR = name;
+  const b = BD[name];
+  if(!b){ alert('Corretor não encontrado: '+name); return; }
+
+  /* Mark selected card */
+  document.querySelectorAll('.bc').forEach(c=>c.classList.remove('sel'));
+  const idx = ORDER().indexOf(name);
+  const el = document.getElementById('bc'+idx);
+  if(el){ el.classList.add('sel'); setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'nearest'}),50); }
+
+  /* Show panel */
+  const panel = document.getElementById('indPanel');
+  panel.style.display = 'block';
+  document.getElementById('iAv').textContent = ini(name);
+  document.getElementById('iNm').textContent = name;
+
+  const cv = (b.caps||[]).reduce((s,c)=>s+c.val,0);
+  const cc = cv * 0.05;
+  document.getElementById('iKpis').innerHTML = `
+    <div class="ik"><div class="ik-n">${(b.s||0)+(b.e||0)}</div><div class="ik-l">Atendimentos</div></div>
+    <div class="ik"><div class="ik-n" style="color:${P.green}">${b.v||0}</div><div class="ik-l">Visitas</div></div>
+    <div class="ik"><div class="ik-n" style="color:${P.amber}">${b.p||0}</div><div class="ik-l">Propostas</div></div>
+    <div class="ik"><div class="ik-n">${(b.caps||[]).length}</div><div class="ik-l">Captações</div></div>
+    <div class="ik"><div class="ik-n" style="font-size:${cv>=1e7?'14':'17'}px">${cv>0?fK(cv):'—'}</div><div class="ik-l">Vol. Captado</div></div>
+    <div class="ik"><div class="ik-n" style="font-size:17px;color:${P.green}">${cc>0?fK(cc):'—'}</div><div class="ik-l">Comissão 5%</div></div>`;
+
+  /* Reset tabs */
+  gTab('igeral', document.querySelector('.it'));
+  /* Destroy old charts */
+  ['iChOrig','iChReg','iChVol','iChCom'].forEach(dc);
+  /* Build all sections */
+  buildIG(b); buildIA(b); buildIC(b); buildII(b);
+  panel.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function closeInd(){
+  document.getElementById('indPanel').style.display='none';
+  document.querySelectorAll('.bc').forEach(c=>c.classList.remove('sel'));
+  ['iChOrig','iChReg','iChVol','iChCom'].forEach(dc);
+  CUR = null;
+}
+
+function gTab(id, btn){
+  document.querySelectorAll('.isec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.it').forEach(t=>t.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  if(btn) btn.classList.add('on');
+}
+
+/* ══════════════════════════════════════════
+   INDIVIDUAL — GERAL
+══════════════════════════════════════════ */
+function buildIG(b){
+  const t = TOT(b)||1;
+  /* Funil */
+  document.getElementById('iFunil').innerHTML = [
+    {l:'Sem atendimento',v:b.s||0,c:P.amber},{l:'Em atendimento',v:b.e||0,c:P.blue},
+    {l:'Visita',v:b.v||0,c:P.green},{l:'Proposta',v:b.p||0,c:P.purple},
+    {l:'Formalização',v:0,c:P.teal},{l:'Concluído',v:0,c:P.lime},
+  ].map(r=>`
+    <div class="fb-row">
+      <span class="fb-lbl">${r.l}</span>
+      <div class="fb-bw"><div class="fb-fill" style="width:${Math.round(r.v/t*100)}%;background:${r.c}"></div></div>
+      <span class="fb-n" style="color:${r.v>0?r.c:'#ccc'}">${r.v}</span>
+    </div>`).join('');
+
+  /* Qualificação */
+  const leads = b.leads||[]; const tq = leads.length||1;
+  const q={morno:0,novo:0,frio:0,sem:0,qual:0};
+  leads.forEach(l=>{if(l.q==='Lead morno')q.morno++;else if(l.q==='Novo lead')q.novo++;else if(l.q==='Lead frio')q.frio++;else if(l.q==='Qualificado')q.qual++;else q.sem++;});
+  document.getElementById('iQualif').innerHTML = [
+    {l:'Sem qualif.',v:q.sem,c:P.teal},{l:'Novo lead',v:q.novo,c:P.blue},
+    {l:'Lead morno',v:q.morno,c:P.amber},{l:'Lead frio',v:q.frio,c:P.red},{l:'Qualificado',v:q.qual,c:P.green},
+  ].map(r=>`
+    <div class="pr">
+      <div class="pr-hd"><span>${r.l}</span><strong>${r.v} (${Math.round(r.v/tq*100)}%)</strong></div>
+      <div class="pb"><div class="pb-fill" style="width:${Math.round(r.v/tq*100)}%;background:${r.c}"></div></div>
+    </div>`).join('');
+
+  /* Origem chart */
+  dc('iChOrig');
+  CH['iChOrig'] = new Chart(document.getElementById('iChOrig'),{type:'doughnut',data:{
+    labels:['Facebook Ads','Indicação','Outros'],
+    datasets:[{data:[Math.round(tq*.88),Math.round(tq*.08),Math.round(tq*.04)],backgroundColor:[P.blue,P.green,P.amber],borderWidth:3,borderColor:'#fff'}]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:9},boxWidth:10,padding:6}}},cutout:'58%'}});
+
+  /* Captações por região */
+  const caps = b.caps||[];
+  const regs={}, vr={};
+  caps.forEach(c=>{regs[c.r]=(regs[c.r]||0)+1; vr[c.r]=(vr[c.r]||0)+c.val;});
+  const rl = Object.keys(regs);
+  dc('iChReg');
+  CH['iChReg'] = new Chart(document.getElementById('iChReg'),{type:'doughnut',data:{
+    labels:rl.length?rl:['Sem captações'],
+    datasets:[{data:rl.length?rl.map(r=>regs[r]):[1],backgroundColor:rl.length?CC.slice(0,rl.length):['#E0E0E0'],borderWidth:3,borderColor:'#fff'}]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:9},boxWidth:10,padding:5}}},cutout:'55%'}});
+
+  dc('iChVol');
+  CH['iChVol'] = new Chart(document.getElementById('iChVol'),{type:'bar',data:{
+    labels:rl.length?rl:['Sem dados'],
+    datasets:[{data:rl.length?rl.map(r=>+(vr[r]/1e6).toFixed(2)):[0],backgroundColor:CC.slice(0,rl.length||1),borderRadius:4}]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{y:{beginAtZero:true,ticks:{callback:v=>v+'M',color:'#999',font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'}},x:{ticks:{color:'#666',font:{size:10}},grid:{display:false}}}}});
+
+  /* Top imóveis demandados */
+  document.getElementById('iTopIm').innerHTML = (b.topIm||[]).length
+    ? (b.topIm||[]).map((im,i)=>`
+        <div class="pr">
+          <div class="pr-hd"><span>${im.c} · ${im.r}</span><strong>${im.l} leads</strong></div>
+          <div class="pb"><div class="pb-fill" style="width:${Math.round(im.l/((b.topIm[0]?.l)||1)*100)}%;background:${CC[i%CC.length]}"></div></div>
+        </div>`).join('')
+    : '<div style="font-size:11px;color:#999;padding:8px 0">Sem dados de demanda disponíveis</div>';
+}
+
+/* ══════════════════════════════════════════
+   INDIVIDUAL — ATENDIMENTOS
+══════════════════════════════════════════ */
+function buildIA(b){
+  const leads = b.leads||[];
+  const mornas = leads.filter(l=>l.q==='Lead morno');
+  const q={morno:0,novo:0,frio:0,sem:0,qual:0};
+  leads.forEach(l=>{if(l.q==='Lead morno')q.morno++;else if(l.q==='Novo lead')q.novo++;else if(l.q==='Lead frio')q.frio++;else if(l.q==='Qualificado')q.qual++;else q.sem++;});
+  const cc = (b.caps||[]).reduce((s,c)=>s+c.val,0)*0.05;
+
+  /* KPIs */
+  document.getElementById('iAtKpis').innerHTML = `
+    <div class="kmi"><div class="kmi-n">${(b.s||0)+(b.e||0)}</div><div class="kmi-l">Total leads</div></div>
+    <div class="kmi" style="border-color:${mornas.length?P.amber:''}"><div class="kmi-n" style="color:${mornas.length?P.amber:'inherit'}">${mornas.length}</div><div class="kmi-l">Lead morno</div></div>
+    <div class="kmi" style="border-color:${(b.s||0)>0?P.red:''}"><div class="kmi-n" style="color:${(b.s||0)>0?P.red:'#ccc'}">${b.s||0}</div><div class="kmi-l">Sem atend.</div></div>
+    <div class="kmi" style="border-color:${(b.v||0)>0?P.green:''}"><div class="kmi-n" style="color:${(b.v||0)>0?P.green:'#ccc'}">${b.v||0}</div><div class="kmi-l">Visitas</div></div>
+    <div class="kmi" style="border-color:${(b.p||0)>0?P.purple:''}"><div class="kmi-n" style="color:${(b.p||0)>0?P.purple:'#ccc'}">${b.p||0}</div><div class="kmi-l">Propostas</div></div>
+    <div class="kmi dark"><div class="kmi-n" style="font-size:18px">~${fK(cc||300000)}</div><div class="kmi-l">Comissão est.</div></div>`;
+
+  /* Table */
+  renderLeads(leads);
+
+  /* Mornas */
+  document.getElementById('iMornas').innerHTML = mornas.length
+    ? mornas.map(l=>`<div class="hot"><div class="hot-name">${l.n}</div><div class="hot-sub">Último contato ${l.t} · ${l.et}</div></div>`).join('')
+    : '<div style="font-size:11px;color:#999">Nenhum lead morno identificado</div>';
+
+  /* Steps */
+  let si=1;
+  let html='';
+  if((b.s||0)>0) html+=`<div class="step"><div class="step-n">${si++}</div><div><div class="step-title">Atender ${b.s} lead(s) urgente(s)</div><div class="step-body">Sem atendimento inicial. Abordar imediatamente.</div></div></div>`;
+  if(mornas.length>0) html+=`<div class="step"><div class="step-n">${si++}</div><div><div class="step-title">Agendar visita — ${mornas.length} lead(s) morna(s)</div><div class="step-body">${mornas.slice(0,2).map(m=>m.n).join(', ')}${mornas.length>2?` e mais ${mornas.length-2}`:''} são prioritários.</div></div></div>`;
+  html+=`<div class="step"><div class="step-n">${si}</div><div><div class="step-title">Qualificar leads sem status</div><div class="step-body">Registrar qualificação melhora a priorização e acompanhamento no CRM.</div></div></div>`;
+  document.getElementById('iSteps').innerHTML = html;
+}
+
+function renderLeads(list){
+  const s = (document.getElementById('iSL')||{}).value||'';
+  const st = (document.getElementById('iFS')||{}).value||'';
+  const f = list.filter(l=>(l.n.toLowerCase().includes(s.toLowerCase())||l.et.toLowerCase().includes(s.toLowerCase()))&&(!st||l.q===st));
+  document.getElementById('iLTb').innerHTML = f.map(l=>`<tr>
+    <td style="font-weight:500">${l.n}</td>
+    <td><span class="bdg ${SB[l.q]||'bs'}">${l.q||'—'}</span></td>
+    <td style="color:#666">${l.t}</td>
+    <td><span class="bdg ${eB[l.et]||'bs'}">${l.et}</span></td>
+  </tr>`).join('');
+  const el=document.getElementById('iLC');
+  if(el) el.textContent=f.length+' clientes';
+}
+function iFL(){ if(CUR) renderLeads(BD[CUR]?.leads||[]); }
+
+/* ══════════════════════════════════════════
+   INDIVIDUAL — CAPTAÇÕES
+══════════════════════════════════════════ */
+function buildIC(b){
+  const caps = b.caps||[];
+  const vol = caps.reduce((s,c)=>s+c.val,0);
+  const com = vol*0.05;
+  const tk = caps.length?Math.round(vol/caps.length):0;
+
+  /* KPIs */
+  document.getElementById('iCKpis').innerHTML = `
+    <div class="kmi"><div class="kmi-n">${caps.length}</div><div class="kmi-l">Captações</div></div>
+    <div class="kmi"><div class="kmi-n" style="font-size:18px">${vol>0?fK(vol):'—'}</div><div class="kmi-l">Volume total</div></div>
+    <div class="kmi dark"><div class="kmi-n" style="font-size:18px">${com>0?fK(com):'—'}</div><div class="kmi-l">Comissão 5%</div></div>
+    <div class="kmi"><div class="kmi-n" style="font-size:18px">${tk>0?fK(tk):'—'}</div><div class="kmi-l">Ticket médio</div></div>
+    <div class="kmi"><div class="kmi-n" style="color:${P.green}">${caps.filter(c=>c.st==='ativo').length}</div><div class="kmi-l">Ativos</div></div>
+    <div class="kmi"><div class="kmi-n" style="font-size:18px">${caps.length?fK(Math.max(...caps.map(c=>c.val))):'—'}</div><div class="kmi-l">Maior captação</div></div>`;
+
+  /* Table */
+  renderCaps(caps);
+
+  /* Comissão chart */
+  dc('iChCom');
+  if(caps.length){
+    const tp = [...caps].sort((a,x)=>x.val-a.val).slice(0,10);
+    CH['iChCom'] = new Chart(document.getElementById('iChCom'),{type:'bar',data:{
+      labels:tp.map(c=>c.c),
+      datasets:[{data:tp.map(c=>Math.round(c.val*.05/1000)),backgroundColor:tp.map((_,i)=>gc(i)),borderRadius:4}]
+    },options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$ '+ctx.raw+'k'}}},
+      scales:{x:{beginAtZero:true,ticks:{callback:v=>v+'k',color:'#999',font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'}},y:{ticks:{color:'#333',font:{size:11}},grid:{display:false}}}}});
+  }
+
+  /* Summary */
+  document.getElementById('iCSum').innerHTML = caps.length ? `
+    <div class="mrow"><span class="ml">Volume total captado</span><span class="mv">${fV(vol)}</span></div>
+    <div class="mrow"><span class="ml">Comissão potencial (5%)</span><span class="mv" style="color:${P.green}">${fV(com)}</span></div>
+    <div class="mrow"><span class="ml">Ticket médio</span><span class="mv">${fV(tk)}</span></div>
+    <div class="mrow"><span class="ml">Maior captação</span><span class="mv">${fV(Math.max(...caps.map(c=>c.val)))}</span></div>
+    <div class="mrow"><span class="ml">Ativos / Total</span><span class="mv">${caps.filter(c=>c.st==='ativo').length} / ${caps.length}</span></div>
+    <div class="mrow"><span class="ml">Regiões captadas</span><span class="mv">${[...new Set(caps.map(c=>c.r))].length}</span></div>
+    <div class="pot"><div class="pot-l">Potencial combinado</div><div class="pot-v">${fK(com+((b.e||0)*55000))}</div></div>`
+    : '<div style="font-size:12px;color:#999;text-align:center;padding:24px 0">Nenhuma captação registrada<br><small style="font-size:11px">Captações próprias aumentam significativamente a comissão</small></div>';
+}
+
+function renderCaps(caps){
+  const s = (document.getElementById('iSC')||{}).value||'';
+  const r = (document.getElementById('iFR')||{}).value||'';
+  const f = caps.filter(c=>(c.c.toLowerCase().includes(s)||c.r.toLowerCase().includes(s)||c.e.toLowerCase().includes(s))&&(!r||c.r===r));
+  document.getElementById('iCTb').innerHTML = f.length
+    ? f.map(c=>`<tr>
+        <td style="font-weight:700">${c.c}</td>
+        <td style="font-size:10px;color:#666">${c.e}</td>
+        <td style="font-size:10px">${c.r}</td>
+        <td style="color:#666">${c.d}d·${c.a}m²</td>
+        <td style="text-align:right;font-weight:600">${fV(c.val)}</td>
+        <td style="text-align:right;font-weight:600;color:${P.green}">${fV(Math.round(c.val*.05))}</td>
+        <td style="text-align:center"><span class="bdg ${c.st==='ativo'?'bok':'bag'}">${c.st==='ativo'?'Ativo':'Aguardando'}</span></td>
+      </tr>`).join('')
+    : '<tr><td colspan="7" style="text-align:center;padding:18px;color:#999">Nenhuma captação encontrada</td></tr>';
+  const el=document.getElementById('iCC');
+  if(el){ const tot=f.reduce((s,c)=>s+c.val,0); el.textContent=f.length+' captações · Total: '+fV(tot); }
+}
+function iFC(){ if(CUR) renderCaps(BD[CUR]?.caps||[]); }
+
+/* ══════════════════════════════════════════
+   INDIVIDUAL — INSIGHTS
+══════════════════════════════════════════ */
+function buildII(b){
+  document.getElementById('iInsC').innerHTML = (b.ins||[]).length
+    ? (b.ins||[]).map(i=>`
+        <div class="ins ${IT[i.tp]||'info'}">
+          <div class="ins-ic">${i.ic}</div>
+          <div><div class="ins-t">${i.ti}</div><div class="ins-b">${i.bdy}</div></div>
+        </div>`).join('')
+    : '<div style="font-size:12px;color:#999">Sem insights disponíveis.</div>';
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+buildTeam();
+buildGrid();
+</script>
+</body>
+</html>
